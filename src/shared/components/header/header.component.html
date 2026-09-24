@@ -1,0 +1,30 @@
+<header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+
+      <a routerLink="/" class="flex items-center gap-2">
+        <span class="text-xl font-extrabold text-navy-800 tracking-tight">KDLT</span>
+        <span class="text-xl font-light text-gold-600">Éditions</span>
+      </a>
+
+      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-navy-700">
+        <a routerLink="/" routerLinkActive="text-navy-900" [routerLinkActiveOptions]="{exact: true}"
+           class="hover:text-navy-900 transition-colors">Accueil</a>
+        <a routerLink="/produits" routerLinkActive="text-navy-900"
+           class="hover:text-navy-900 transition-colors">Produits</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a *ngIf="!authService.isLoggedIn()" routerLink="/auth/login"
+           class="inline-flex items-center gap-2 rounded-full bg-navy-800 hover:bg-navy-900 text-white text-sm font-semibold px-5 py-2.5 transition-colors">
+          Connexion
+        </a>
+        <button *ngIf="authService.isLoggedIn()" (click)="logout()"
+                class="inline-flex items-center gap-2 rounded-full border border-navy-200 hover:bg-navy-50 text-navy-700 text-sm font-semibold px-5 py-2.5 transition-colors">
+          Déconnexion
+        </button>
+      </div>
+
+    </div>
+  </div>
+</header>
