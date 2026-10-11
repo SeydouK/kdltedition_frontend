@@ -12,6 +12,8 @@
            class="hover:text-navy-900 transition-colors">Accueil</a>
         <a routerLink="/produits" routerLinkActive="text-navy-900"
            class="hover:text-navy-900 transition-colors">Produits</a>
+        <a *ngIf="authService.isLoggedIn()" routerLink="/panier" routerLinkActive="text-navy-900"
+           class="hover:text-navy-900 transition-colors">Panier</a>
       </nav>
 
       <div class="flex items-center gap-3">

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -27,6 +28,11 @@ export const routes: Routes = [
     path: 'auth/inscription',
     loadComponent: () =>
       import('./features/auth/customer-register/customer-register').then((m) => m.CustomerRegister),
+  },
+  {
+    path: 'panier',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/cart/cart').then((m) => m.CartPage),
   },
   {
     path: '**',
