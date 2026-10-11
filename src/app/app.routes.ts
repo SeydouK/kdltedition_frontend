@@ -35,6 +35,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/cart/cart').then((m) => m.CartPage),
   },
   {
+    path: 'mes-commandes',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/account/my-orders/my-orders').then((m) => m.MyOrders),
+  },
+  {
+    path: 'mes-devis',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/account/my-quotes/my-quotes').then((m) => m.MyQuotes),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
