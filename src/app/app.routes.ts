@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
-
+import { roleGuard } from './core/guards/role.guard';
+import { Role } from './core/models/role.enum';
 export const routes: Routes = [
   {
     path: '',
@@ -43,6 +44,23 @@ export const routes: Routes = [
     path: 'mes-devis',
     canActivate: [authGuard],
     loadComponent: () => import('./features/account/my-quotes/my-quotes').then((m) => m.MyQuotes),
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard, roleGuard],
+    data: { roles: [Role.STAFF, Role.OWNER, Role.ADMIN] },
+    loadComponent: () =>
+      import('./features/admin/admin-layout/admin-layout').then((m) => m.AdminLayout),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        canActivate: [roleGuard],
+        data: { roles: [Role.OWNER, Role.ADMIN] },
+        loadComponent: () =>
+          import('./features/admin/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboard),
+      },
+    ],
   },
   {
     path: '**',

@@ -18,6 +18,9 @@
            class="hover:text-navy-900 transition-colors">Mes commandes</a>
         <a *ngIf="authService.isLoggedIn()" routerLink="/mes-devis" routerLinkActive="text-navy-900"
            class="hover:text-navy-900 transition-colors">Mes devis</a>
+        <a *ngIf="authService.hasRole(Role.STAFF, Role.OWNER, Role.ADMIN)"
+           routerLink="/admin" routerLinkActive="text-navy-900"
+           class="hover:text-navy-900 transition-colors">Administration</a>
       </nav>
 
       <div class="flex items-center gap-3">

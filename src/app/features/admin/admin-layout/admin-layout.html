@@ -1,0 +1,21 @@
+<div class="max-w-7xl mx-auto px-4 lg:px-8 py-8 flex flex-col md:flex-row gap-8">
+
+  <aside class="md:w-56 flex-shrink-0">
+    <p class="text-xs font-bold uppercase tracking-wide text-slate-400 mb-3">Administration</p>
+
+    <nav class="flex md:flex-col gap-2 overflow-x-auto pb-2 md:pb-0">
+      <a *ngIf="authService.hasRole(Role.OWNER, Role.ADMIN)"
+         routerLink="/admin"
+         routerLinkActive="bg-navy-800 text-white"
+         [routerLinkActiveOptions]="{ exact: true }"
+         class="flex-shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold text-navy-700 hover:bg-navy-50 transition-colors">
+        Tableau de bord
+      </a>
+    </nav>
+  </aside>
+
+  <section class="flex-1 min-w-0">
+    <router-outlet></router-outlet>
+  </section>
+
+</div>
