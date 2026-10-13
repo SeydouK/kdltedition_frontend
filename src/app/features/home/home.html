@@ -1,40 +1,41 @@
 <!-- ═══ HERO ═══ -->
-<section class="mx-auto w-full max-w-page px-4 py-12 sm:px-6 lg:py-20">
-  <div class="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+<section class="bg-brand-800 text-white">
+  <div class="mx-auto w-full max-w-page px-4 py-12 sm:px-6 lg:py-20">
+    <div class="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
 
-    <div>
-      <p class="eyebrow">Imprimerie &amp; édition professionnelle</p>
-      <h1 class="display mt-3 text-[2.25rem] font-semibold leading-[1.1] text-ink sm:text-5xl">
-        Des supports imprimés à la hauteur de vos idées
-      </h1>
-      <p class="mt-5 max-w-xl text-base leading-relaxed text-ink-2">
-        Papeterie médicale, supports professionnels et solutions d'édition sur mesure, au service des
-        entreprises, institutions et professionnels de santé.
-      </p>
-      <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a routerLink="/produits" class="btn-primary btn-lg">Découvrir nos produits</a>
-        <a routerLink="/services" class="btn-secondary btn-lg">Nos services</a>
+      <div>
+        <p class="text-2xs font-semibold uppercase tracking-eyebrow text-accent-300">Imprimerie &amp; édition professionnelle</p>
+        <h1 class="display mt-3 text-[2.25rem] font-semibold leading-[1.1] text-white sm:text-5xl">
+          Des supports imprimés à la hauteur de vos idées
+        </h1>
+        <p class="mt-5 max-w-xl text-base leading-relaxed text-white/75">
+          Papeterie médicale, supports professionnels et solutions d'édition sur mesure, au service des
+          entreprises, institutions et professionnels de santé.
+        </p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a routerLink="/produits" class="btn btn-lg bg-surface text-brand-800 hover:bg-brand-50">Découvrir nos produits</a>
+          <a routerLink="/services" class="btn btn-lg border-white/30 text-white hover:bg-white/10">Nos services</a>
+        </div>
       </div>
-    </div>
 
-    <div class="card card-pad">
-      <p class="eyebrow">De l'idée au produit fini</p>
-      <ol class="mt-5 space-y-4">
-        @for (step of steps; track step.label) {
-        <li class="flex items-start gap-4">
-          <span class="icon-tile-brand"><i class="pi {{ step.icon }}"></i></span>
-          <div>
-            <p class="text-sm font-semibold text-ink">{{ step.label }}</p>
-            <p class="text-sm text-ink-2">{{ step.text }}</p>
-          </div>
-        </li>
-        }
-      </ol>
-    </div>
+      <div class="card card-pad text-ink shadow-pop">
+        <p class="eyebrow">De l'idée au produit fini</p>
+        <ol class="mt-5 space-y-4">
+          @for (step of steps; track step.label) {
+          <li class="flex items-start gap-4">
+            <span class="icon-tile-brand"><i class="pi {{ step.icon }}"></i></span>
+            <div>
+              <p class="text-sm font-semibold text-ink">{{ step.label }}</p>
+              <p class="text-sm text-ink-2">{{ step.text }}</p>
+            </div>
+          </li>
+          }
+        </ol>
+      </div>
 
+    </div>
   </div>
 </section>
-
 <!-- ═══ SECTEURS ═══ -->
 <section class="border-y border-line bg-surface">
   <div class="mx-auto flex w-full max-w-page flex-wrap items-center gap-3 px-4 py-5 sm:px-6">
