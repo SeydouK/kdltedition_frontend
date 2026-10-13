@@ -1,0 +1,58 @@
+<div class="overflow-hidden rounded-3xl bg-brand-800 text-white">
+  <div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:p-14">
+
+    <div>
+      <p class="text-2xs font-semibold uppercase tracking-eyebrow text-accent-300">Solution numérique</p>
+      <h2 class="display mt-3 text-[1.75rem] font-semibold leading-[1.15] sm:text-4xl">
+        TKARD GO : votre carte de visite, désormais numérique
+      </h2>
+      <p class="mt-4 max-w-xl text-[15px] leading-relaxed text-white/75">
+        Une carte de visite qui se partage d'un geste et ne se perd jamais, pour que chaque rencontre
+        professionnelle laisse une trace.
+      </p>
+
+      <ul class="mt-6 space-y-3 text-[15px] text-white/85">
+        @for (feature of features; track feature) {
+        <li class="flex items-start gap-3">
+          <i class="pi pi-check mt-1 text-sm text-accent-300"></i>
+          <span>{{ feature }}</span>
+        </li>
+        }
+      </ul>
+
+      <div class="mt-8">
+        <a [href]="url" target="_blank" rel="noopener" class="btn-accent btn-lg">
+          Découvrir TKARD GO
+          <i class="pi pi-arrow-up-right text-xs"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Illustration : exemple de carte, purement décorative -->
+    <div class="mx-auto w-full max-w-xs" aria-hidden="true">
+      <div class="rounded-3xl bg-surface p-6 text-ink shadow-pop">
+        <div class="flex items-center gap-4">
+          <span class="avatar h-14 w-14 text-lg">PN</span>
+          <div class="min-w-0">
+            <p class="truncate text-base font-semibold">Prénom Nom</p>
+            <p class="truncate text-sm text-ink-2">Fonction · Entreprise</p>
+          </div>
+        </div>
+
+        <div class="my-5 border-t border-line"></div>
+
+        <div class="flex items-center justify-between gap-4">
+          <div class="space-y-2 text-sm text-ink-2">
+            <p class="flex items-center gap-2"><i class="pi pi-phone text-xs text-ink-3"></i>+225 00 00 00 00 00</p>
+            <p class="flex items-center gap-2"><i class="pi pi-envelope text-xs text-ink-3"></i>prenom&#64;entreprise.ci</p>
+          </div>
+          <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-line-strong text-3xl text-brand-700">
+            <i class="pi pi-qrcode"></i>
+          </span>
+        </div>
+      </div>
+      <p class="mt-3 text-center text-xs text-white/50">Exemple de carte</p>
+    </div>
+
+  </div>
+</div>
