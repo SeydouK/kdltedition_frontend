@@ -1,0 +1,60 @@
+<nav class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface md:hidden"
+     style="padding-bottom: env(safe-area-inset-bottom)" aria-label="Navigation mobile">
+  <div class="flex h-16">
+    <a routerLink="/" routerLinkActive="tabbar-item--active" [routerLinkActiveOptions]="{ exact: true }" class="tabbar-item flex-1">
+      <i class="pi pi-home text-lg"></i><span>Accueil</span>
+    </a>
+    <a routerLink="/produits" routerLinkActive="tabbar-item--active" class="tabbar-item flex-1">
+      <i class="pi pi-th-large text-lg"></i><span>Produits</span>
+    </a>
+    <a routerLink="/services" routerLinkActive="tabbar-item--active" class="tabbar-item flex-1">
+      <i class="pi pi-briefcase text-lg"></i><span>Services</span>
+    </a>
+    @if (authService.isLoggedIn()) {
+    <a routerLink="/panier" routerLinkActive="tabbar-item--active" class="tabbar-item flex-1">
+      <i class="pi pi-shopping-cart text-lg"></i><span>Panier</span>
+    </a>
+    }
+    <button type="button" (click)="openSheet()" class="tabbar-item flex-1">
+      <i class="pi pi-user text-lg"></i><span>Compte</span>
+    </button>
+  </div>
+</nav>
+
+@if (sheetOpen) {
+<div class="fixed inset-0 z-50 md:hidden">
+  <button type="button" class="absolute inset-0 bg-ink/40" aria-label="Fermer le menu" (click)="closeSheet()"></button>
+
+  <div class="animate-slideUp absolute inset-x-0 bottom-0 rounded-t-3xl bg-surface p-4 shadow-pop"
+       style="padding-bottom: calc(1.5rem + env(safe-area-inset-bottom))" role="dialog" aria-label="Menu du compte">
+
+    @if (authService.isLoggedIn()) {
+    <div class="px-3 pb-3 pt-1">
+      <p class="text-2xs font-semibold uppercase tracking-eyebrow text-ink-3">Connecté en tant que</p>
+      <p class="truncate text-sm font-semibold text-ink">{{ email }}</p>
+    </div>
+    <a routerLink="/mes-commandes" (click)="closeSheet()" class="sheet-item">
+      <i class="pi pi-shopping-bag"></i>Mes commandes
+    </a>
+    <a routerLink="/mes-devis" (click)="closeSheet()" class="sheet-item">
+      <i class="pi pi-file"></i>Mes devis
+    </a>
+    @if (isStaff) {
+    <a routerLink="/admin" (click)="closeSheet()" class="sheet-item font-semibold text-brand-700">
+      <i class="pi pi-chart-bar"></i>Administration
+    </a>
+    }
+    <button type="button" (click)="logout()" class="sheet-item w-full text-danger">
+      <i class="pi pi-sign-out"></i>Déconnexion
+    </button>
+    } @else {
+    <a routerLink="/auth/login" (click)="closeSheet()" class="sheet-item">
+      <i class="pi pi-sign-in"></i>Connexion
+    </a>
+    <a routerLink="/auth/inscription" (click)="closeSheet()" class="sheet-item font-semibold text-brand-700">
+      <i class="pi pi-user-plus"></i>Créer un compte
+    </a>
+    }
+  </div>
+</div>
+}
