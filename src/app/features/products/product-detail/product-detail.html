@@ -1,81 +1,146 @@
-<div class="max-w-5xl mx-auto px-4 lg:px-8 py-10">
+<div class="page">
 
-  <div *ngIf="loading" class="text-center py-20 text-slate-400">
-    Chargement du produit...
+  <a routerLink="/produits" class="btn-ghost btn-sm -ml-3 mb-4">
+    <i class="pi pi-arrow-left text-xs"></i>Retour au catalogue
+  </a>
+
+  @if (loading) {
+  <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
+    <div class="skeleton aspect-[4/3] rounded-2xl"></div>
+    <div class="space-y-4">
+      <div class="skeleton h-5 w-24 rounded-full"></div>
+      <div class="skeleton h-9 w-3/4 rounded"></div>
+      <div class="skeleton h-4 w-full rounded"></div>
+      <div class="skeleton h-4 w-5/6 rounded"></div>
+    </div>
   </div>
+  }
 
-  <div *ngIf="error" class="text-center py-20 text-red-500">
-    Produit introuvable.
-    <a routerLink="/produits" class="block mt-4 text-navy-700 underline">Retour au catalogue</a>
+  @if (error) {
+  <div class="empty">
+    <span class="empty-icon"><i class="pi pi-exclamation-circle"></i></span>
+    <p class="empty-title">Produit introuvable</p>
+    <p class="empty-text">Ce produit n'existe plus ou n'est plus disponible.</p>
+    <a routerLink="/produits" class="btn-secondary mt-5">Retour au catalogue</a>
   </div>
+  }
 
-  <div *ngIf="product && !loading" class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+  @if (product && !loading) {
+  <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
 
     <!-- Image -->
-    <div class="rounded-3xl overflow-hidden bg-slate-100 aspect-[4/3] shadow-card">
-      <img [src]="product.imageUrl || 'https://placehold.co/800x600/EAF1F8/0F2E4E?text=' + product.name"
-           [alt]="product.name"
-           class="w-full h-full object-cover"/>
+    <div class="card overflow-hidden self-start">
+      <div class="aspect-[4/3] bg-muted">
+        @if (product.imageUrl) {
+        <img [src]="product.imageUrl" [alt]="product.name" class="h-full w-full object-cover">
+        } @else {
+        <div class="flex h-full w-full items-center justify-center text-5xl text-ink-3">
+          <i class="pi pi-image"></i>
+        </div>
+        }
+      </div>
     </div>
 
-    <!-- Infos -->
+    <!-- Informations -->
     <div>
-      <a routerLink="/produits" class="text-sm text-navy-500 hover:text-navy-700 font-semibold mb-3 inline-block">
-        ← Retour au catalogue
-      </a>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="badge-brand">{{ product.categoryName }}</span>
+        @if (product.type === 'CUSTOM') {
+        <span class="badge-accent">Sur devis</span>
+        }
+      </div>
 
-      <span class="inline-block rounded-full bg-navy-50 text-navy-700 text-xs font-bold px-3 py-1 mb-3">
-        {{ product.categoryName }}
-      </span>
+      <h1 class="page-title mt-3">{{ product.name }}</h1>
 
-      <h1 class="text-2xl lg:text-3xl font-extrabold text-navy-900 tracking-tight">{{ product.name }}</h1>
+      <p class="mt-4 whitespace-pre-line text-[15px] leading-relaxed text-ink-2">{{ product.description }}</p>
 
-      <p class="mt-4 text-slate-600 leading-relaxed">{{ product.description }}</p>
-
-      <div class="mt-6 text-2xl font-bold text-navy-800">
+      <p class="tabular mt-6 text-2xl font-semibold text-ink">
         {{ formatPrice(product.basePrice) }}
-      </div>
+        @if (product.type === 'STANDARD') {
+        <span class="text-sm font-medium text-ink-3">l'unité</span>
+        }
+      </p>
 
-      <!-- Messages -->
-      <div *ngIf="successMessage" class="mt-6 rounded-xl bg-green-50 border border-green-200 text-green-700 px-4 py-3 text-sm font-medium">
-        {{ successMessage }}
+      @if (successMessage) {
+      <div class="alert-success mt-6">
+        <i class="pi pi-check-circle mt-0.5"></i>
+        <div>
+          <p class="font-semibold">{{ successMessage }}</p>
+          @if (successLink) {
+          <a [routerLink]="successLink.path" class="link">{{ successLink.label }}</a>
+          }
+        </div>
       </div>
-      <div *ngIf="errorMessage" class="mt-6 rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm font-medium">
-        {{ errorMessage }}
+      }
+
+      @if (errorMessage) {
+      <div class="alert-danger mt-6">
+        <i class="pi pi-exclamation-circle mt-0.5"></i>
+        <span>{{ errorMessage }}</span>
       </div>
+      }
 
-      <!-- ═ Produit STANDARD : panier ═ -->
-      <div *ngIf="product.type === 'STANDARD'" class="mt-8 p-6 rounded-3xl border border-slate-200 bg-white shadow-card">
-        <label class="block text-sm font-semibold text-navy-700 mb-2">Quantité</label>
-        <input type="number" min="1" [(ngModel)]="quantity"
-               class="w-24 rounded-xl border border-slate-300 px-3 py-2 text-navy-900 font-semibold focus:outline-none focus:ring-2 focus:ring-navy-400"/>
+      <!-- Produit standard : panier -->
+      @if (product.type === 'STANDARD') {
+      <div class="card card-pad mt-8">
+        <div class="field">
+          <label class="field-label" for="quantity">Quantité</label>
+          <input id="quantity" name="quantity" type="number" min="1" [(ngModel)]="quantity"
+                 class="field-input w-28">
+        </div>
 
-        <button (click)="addToCart()" [disabled]="submitting"
-                class="mt-5 w-full inline-flex items-center justify-center gap-2 bg-navy-800 hover:bg-navy-900 disabled:opacity-60 text-white font-bold px-6 py-3.5 rounded-2xl shadow-cta transition-colors">
-          {{ submitting ? 'Ajout...' : 'Ajouter au panier' }}
+        @if (total !== null) {
+        <div class="mt-5 flex items-center justify-between border-t border-line pt-4">
+          <span class="text-sm text-ink-2">Total</span>
+          <span class="tabular text-lg font-semibold text-ink">{{ formatPrice(total) }}</span>
+        </div>
+        }
+
+        <button type="button" class="btn-primary btn-lg btn-block mt-5" [disabled]="submitting" (click)="addToCart()">
+          {{ submitting ? 'Ajout en cours...' : 'Ajouter au panier' }}
         </button>
+
+        @if (!authService.isLoggedIn()) {
+        <p class="field-hint mt-3 text-center">Vous serez invité à vous connecter pour continuer.</p>
+        }
       </div>
+      }
 
-      <!-- ═ Produit CUSTOM : devis ═ -->
-      <div *ngIf="product.type === 'CUSTOM'" class="mt-8 p-6 rounded-3xl border border-slate-200 bg-white shadow-card">
-        <h3 class="font-bold text-navy-900 mb-1">Demander un devis</h3>
-        <p class="text-sm text-slate-500 mb-4">Ce produit est personnalisable. Décrivez votre besoin pour recevoir une proposition.</p>
+      <!-- Produit sur mesure : devis -->
+      @if (product.type === 'CUSTOM') {
+      <div class="card card-pad mt-8">
+        <h2 class="section-title">Demander un devis</h2>
+        <p class="section-lead">
+          Ce produit est personnalisable. Décrivez votre besoin, nous vous répondons par une proposition de prix.
+        </p>
 
-        <label class="block text-sm font-semibold text-navy-700 mb-2">Quantité souhaitée</label>
-        <input type="number" min="1" [(ngModel)]="quantity"
-               class="w-24 rounded-xl border border-slate-300 px-3 py-2 text-navy-900 font-semibold focus:outline-none focus:ring-2 focus:ring-navy-400 mb-4"/>
+        <div class="mt-5 flex flex-col gap-4">
+          <div class="field">
+            <label class="field-label" for="quote-quantity">Quantité souhaitée</label>
+            <input id="quote-quantity" name="quoteQuantity" type="number" min="1" [(ngModel)]="quantity"
+                   class="field-input w-28">
+          </div>
 
-        <label class="block text-sm font-semibold text-navy-700 mb-2">Précisions (facultatif)</label>
-        <textarea [(ngModel)]="specifications" rows="4"
-                  placeholder="Format, finition, personnalisation, délai souhaité..."
-                  class="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-400"></textarea>
+          <div class="field">
+            <label class="field-label" for="specifications">Précisions (facultatif)</label>
+            <textarea id="specifications" name="specifications" rows="4" [(ngModel)]="specifications"
+                      placeholder="Format, finition, personnalisation, délai souhaité..."
+                      class="field-input"></textarea>
+          </div>
 
-        <button (click)="requestQuote()" [disabled]="submitting"
-                class="mt-5 w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-500 hover:to-gold-600 disabled:opacity-60 text-navy-900 font-bold px-6 py-3.5 rounded-2xl shadow-cta transition-all">
-          {{ submitting ? 'Envoi...' : 'Demander un devis' }}
-        </button>
+          <button type="button" class="btn-primary btn-lg btn-block" [disabled]="submitting" (click)="requestQuote()">
+            {{ submitting ? 'Envoi en cours...' : 'Demander un devis' }}
+          </button>
+
+          @if (!authService.isLoggedIn()) {
+          <p class="field-hint text-center">Vous serez invité à vous connecter pour continuer.</p>
+          }
+        </div>
       </div>
+      }
 
     </div>
   </div>
+  }
+
 </div>

@@ -5,11 +5,13 @@ import { Product } from '../../core/models/product.model';
 import { Category } from '../../core/models/category.model';
 import { TkardPromo } from '../../shared/components/tkard-promo/tkard-promo';
 import { PROCESS_STEPS, SECTORS } from '../../core/config/content';
+import { ProductCard } from '../../shared/components/product-card/product-card';
+
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, TkardPromo],
+  imports: [RouterLink, TkardPromo, ProductCard],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

@@ -20,11 +20,19 @@
         }
       </ul>
 
-      <div class="mt-8">
-        <a [href]="url" target="_blank" rel="noopener" class="btn-accent btn-lg">
-          Découvrir TKARD GO
-          <i class="pi pi-arrow-up-right text-xs"></i>
-        </a>
+      <div class="mt-8 flex flex-col gap-4">
+        <div>
+          <a [href]="url" target="_blank" rel="noopener" class="btn-accent btn-lg">
+            Accéder à TKARD GO
+            <i class="pi pi-arrow-up-right text-xs"></i>
+          </a>
+        </div>
+        <p class="text-sm text-white/65">
+          L'accès se fait sur invitation.
+          <a [href]="contactMailto" class="font-semibold text-white underline underline-offset-4 hover:text-accent-300">
+            Contactez-nous pour obtenir le vôtre.
+          </a>
+        </p>
       </div>
     </div>
 

@@ -42,7 +42,7 @@ export class Services {
     {
       icon: 'pi-mobile',
       title: 'Solutions numériques',
-      text: "TKARD GO, notre carte de visite numérique, prolonge l'imprimé vers le digital.",
+      text: "TKARD GO, notre carte de visite numérique à puce NFC, prolonge l'imprimé vers le digital.",
     },
   ];
 }
