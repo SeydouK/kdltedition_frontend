@@ -1,0 +1,31 @@
+<div class="auth-shell">
+
+  <aside class="auth-aside">
+    <div>
+      <a routerLink="/" class="flex items-center gap-2.5" aria-label="KDLT Éditions, accueil">
+        <span class="display flex h-9 w-9 items-center justify-center rounded-[10px] bg-white/10 text-lg font-semibold text-white">K</span>
+        <span class="display text-xl font-semibold leading-none text-white">KDLT <span class="text-accent-300">Éditions</span></span>
+      </a>
+
+      <h2 class="auth-aside-title">{{ title() }}</h2>
+
+      <ul class="auth-aside-list">
+        @for (point of points(); track point) {
+        <li>
+          <i class="pi pi-check"></i>
+          <span>{{ point }}</span>
+        </li>
+        }
+      </ul>
+    </div>
+
+    <p class="text-xs text-white/45">© {{ currentYear }} KDLT Éditions Imprimerie</p>
+  </aside>
+
+  <div class="auth-main">
+    <div class="auth-card">
+      <ng-content></ng-content>
+    </div>
+  </div>
+
+</div>

@@ -1,54 +1,80 @@
-<div class="min-h-[70vh] flex items-center justify-center px-4 py-12">
-  <div class="w-full max-w-md">
+<app-auth-layout title="Un compte pour commander et suivre vos projets" [points]="points">
 
-    <div class="text-center mb-8">
-      <h1 class="text-2xl font-extrabold text-navy-900">Créer un compte</h1>
-      <p class="text-slate-500 mt-2">Rejoignez KDLT Éditions pour commander et suivre vos projets.</p>
+  <h1 class="auth-title">Créer un compte</h1>
+  <p class="auth-lead">Rejoignez KDLT Éditions pour commander et suivre vos projets.</p>
+
+  <form class="auth-form" (ngSubmit)="onSubmit()" novalidate>
+
+    @if (errorMessage) {
+    <div class="alert-danger" role="alert">
+      <i class="pi pi-exclamation-circle mt-0.5"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+    }
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="field">
+        <label class="field-label" for="firstName">Prénom</label>
+        <input id="firstName" name="firstName" type="text" autocomplete="given-name"
+               class="field-input" [class.border-danger]="fieldErrors['firstName']" [(ngModel)]="firstName">
+        @if (fieldErrors['firstName']) {
+        <p class="field-error">{{ fieldErrors['firstName'] }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="lastName">Nom</label>
+        <input id="lastName" name="lastName" type="text" autocomplete="family-name"
+               class="field-input" [class.border-danger]="fieldErrors['lastName']" [(ngModel)]="lastName">
+        @if (fieldErrors['lastName']) {
+        <p class="field-error">{{ fieldErrors['lastName'] }}</p>
+        }
+      </div>
     </div>
 
-    <form (ngSubmit)="onSubmit()" class="bg-white rounded-3xl border border-slate-200 shadow-card p-8">
+    <div class="field">
+      <label class="field-label" for="email">Adresse email</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="vous@exemple.com"
+             class="field-input" [class.border-danger]="fieldErrors['email']" [(ngModel)]="email">
+      @if (fieldErrors['email']) {
+      <p class="field-error">{{ fieldErrors['email'] }}</p>
+      }
+    </div>
 
-      <div *ngIf="errorMessage" class="mb-5 rounded-xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm font-medium">
-        {{ errorMessage }}
+    <div class="field">
+      <label class="field-label" for="phoneNumber">Téléphone <span class="font-normal text-ink-3">(facultatif)</span></label>
+      <input id="phoneNumber" name="phoneNumber" type="tel" autocomplete="tel"
+             class="field-input" [(ngModel)]="phoneNumber">
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="password">Mot de passe</label>
+      <div class="relative">
+        <input id="password" name="password" autocomplete="new-password"
+               [type]="showPassword ? 'text' : 'password'"
+               class="field-input pr-11" [class.border-danger]="fieldErrors['password']" [(ngModel)]="password">
+        <button type="button" (click)="showPassword = !showPassword"
+                class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-ink-3 hover:text-ink"
+                [attr.aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'">
+          <i class="pi" [class.pi-eye]="!showPassword" [class.pi-eye-slash]="showPassword"></i>
+        </button>
       </div>
-      <div *ngIf="successMessage" class="mb-5 rounded-xl bg-green-50 border border-green-200 text-green-700 px-4 py-3 text-sm font-medium">
-        {{ successMessage }}
-      </div>
+      @if (fieldErrors['password']) {
+      <p class="field-error">{{ fieldErrors['password'] }}</p>
+      } @else {
+      <p class="field-hint">8 caractères minimum.</p>
+      }
+    </div>
 
-      <div class="grid grid-cols-2 gap-4 mb-5">
-        <div>
-          <label class="block text-sm font-semibold text-navy-700 mb-2">Prénom</label>
-          <input type="text" name="firstName" [(ngModel)]="firstName" required
-                 class="w-full rounded-xl border border-slate-300 px-4 py-3 text-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-400"/>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-navy-700 mb-2">Nom</label>
-          <input type="text" name="lastName" [(ngModel)]="lastName" required
-                 class="w-full rounded-xl border border-slate-300 px-4 py-3 text-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-400"/>
-        </div>
-      </div>
+    <button type="submit" class="btn-primary btn-lg btn-block mt-1" [disabled]="submitting">
+      {{ submitting ? 'Création en cours...' : 'Créer mon compte' }}
+    </button>
 
-      <label class="block text-sm font-semibold text-navy-700 mb-2">Email</label>
-      <input type="email" name="email" [(ngModel)]="email" required
-             class="w-full rounded-xl border border-slate-300 px-4 py-3 text-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-400 mb-5"/>
+  </form>
 
-      <label class="block text-sm font-semibold text-navy-700 mb-2">Téléphone (facultatif)</label>
-      <input type="tel" name="phoneNumber" [(ngModel)]="phoneNumber"
-             class="w-full rounded-xl border border-slate-300 px-4 py-3 text-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-400 mb-5"/>
+  <p class="auth-foot">
+    Déjà un compte ?
+    <a routerLink="/auth/login" [queryParams]="returnUrl ? { returnUrl: returnUrl } : {}" class="link">Connectez-vous</a>
+  </p>
 
-      <label class="block text-sm font-semibold text-navy-700 mb-2">Mot de passe</label>
-      <input type="password" name="password" [(ngModel)]="password" required
-             class="w-full rounded-xl border border-slate-300 px-4 py-3 text-navy-900 focus:outline-none focus:ring-2 focus:ring-navy-400 mb-6"/>
-
-      <button type="submit" [disabled]="submitting"
-              class="w-full inline-flex items-center justify-center gap-2 bg-navy-800 hover:bg-navy-900 disabled:opacity-60 text-white font-bold px-6 py-3.5 rounded-2xl shadow-cta transition-colors">
-        {{ submitting ? 'Création...' : 'Créer mon compte' }}
-      </button>
-
-      <p class="text-center text-sm text-slate-500 mt-5">
-        Déjà un compte ? <a routerLink="/auth/login" class="text-navy-700 font-semibold hover:underline">Connectez-vous</a>
-      </p>
-    </form>
-
-  </div>
-</div>
+</app-auth-layout>

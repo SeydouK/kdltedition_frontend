@@ -1,43 +1,63 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { AuthLayout } from '../../../shared/components/auth-layout/auth-layout';
+import { extractError, safeReturnUrl } from '../../../core/utils/http.utils';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, RouterLink, AuthLayout],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login {
   email = '';
   password = '';
+  showPassword = false;
+
   submitting = false;
   errorMessage = '';
+  fieldErrors: Record<string, string> = {};
+
+  readonly returnUrl: string | null;
+
+  readonly points = [
+    "Suivez l'état de vos commandes",
+    'Retrouvez vos demandes de devis et nos réponses',
+    'Commandez vos produits en quelques clics',
+  ];
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute,
-  ) {}
+    route: ActivatedRoute,
+  ) {
+    this.returnUrl = route.snapshot.queryParamMap.get('returnUrl');
+  }
 
   onSubmit(): void {
-    if (!this.email || !this.password) return;
+    this.errorMessage = '';
+    this.fieldErrors = {};
+
+    if (!this.email.trim()) this.fieldErrors['email'] = 'Saisissez votre adresse email.';
+    if (!this.password) this.fieldErrors['password'] = 'Saisissez votre mot de passe.';
+    if (Object.keys(this.fieldErrors).length) return;
 
     this.submitting = true;
-    this.errorMessage = '';
 
-    this.authService.login(this.email, this.password).subscribe({
+    this.authService.login(this.email.trim(), this.password).subscribe({
       next: () => {
         this.submitting = false;
-        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
-        this.router.navigateByUrl(returnUrl);
+        this.router.navigateByUrl(safeReturnUrl(this.returnUrl));
       },
       error: (err) => {
         this.submitting = false;
-        this.errorMessage = err?.error?.message || err?.error || 'Email ou mot de passe incorrect.';
+        this.errorMessage = extractError(
+          err,
+          'Connexion impossible pour le moment. Réessayez dans quelques instants.',
+        );
       },
     });
   }
