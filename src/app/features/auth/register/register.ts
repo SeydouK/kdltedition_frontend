@@ -25,6 +25,7 @@ export class Register implements OnInit {
   email = '';
   phoneNumber = '';
   password = '';
+  inviteMessage = '';
   showPassword = false;
 
   submitting = false;
@@ -55,6 +56,13 @@ export class Register implements OnInit {
       .get<any>(`${environment.apiUrl}/invites/${encodeURIComponent(this.token)}`)
       .subscribe({
         next: (data) => {
+          // Le backend répond toujours 200 : une invitation refusée est signalée par valid === false.
+          if (data?.valid === false) {
+            this.inviteMessage = typeof data.message === 'string' ? data.message : '';
+            this.checkingToken = false;
+            return;
+          }
+
           // Si l'invitation renvoie l'adresse invitée, on la pré-remplit et on la verrouille.
           const invitedEmail = typeof data?.email === 'string' ? data.email : '';
           if (invitedEmail) {

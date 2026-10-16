@@ -11,9 +11,7 @@
   <div class="empty">
     <span class="empty-icon"><i class="pi pi-clock"></i></span>
     <p class="empty-title">Invitation invalide ou expirée</p>
-    <p class="empty-text">
-      Ce lien n'est plus valable. Demandez à l'administrateur de vous en envoyer un nouveau.
-    </p>
+    <p class="empty-text">{{ inviteMessage || "Ce lien n'est plus valable. Demandez à l'administrateur de vous en envoyer un nouveau." }}</p>
     <a routerLink="/" class="btn-secondary mt-5">Retour à l'accueil</a>
   </div>
   } @else {
