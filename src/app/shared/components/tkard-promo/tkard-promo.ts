@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { CONTACT_EMAIL, TKARD_GO_URL } from '../../../core/config/links';
+import { CONTACT_EMAIL, KDEDITIONGO_URL } from '../../../core/config/links';
 
 @Component({
   selector: 'app-tkard-promo',
@@ -8,9 +8,9 @@ import { CONTACT_EMAIL, TKARD_GO_URL } from '../../../core/config/links';
   styleUrl: './tkard-promo.css',
 })
 export class TkardPromo {
-  readonly url = TKARD_GO_URL;
+  readonly url = KDEDITIONGO_URL;
   readonly contactMailto =
-    'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent("Demande d'accès à TKARD GO");
+    'mailto:' + CONTACT_EMAIL + '?subject=' + encodeURIComponent("Demande d'accès à KDEditionGO");
 
   readonly features = [
     "Une carte physique à puce NFC : approchez-la d'un smartphone compatible, votre fiche s'ouvre",
