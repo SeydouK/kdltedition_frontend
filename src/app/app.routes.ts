@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role.guard';
 import { Role } from './core/models/role.enum';
+import { adminHomeGuard } from './core/guards/admin-home.guard';
+
 export const routes: Routes = [
   {
     path: '',
@@ -55,10 +57,26 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        canActivate: [roleGuard],
-        data: { roles: [Role.OWNER, Role.ADMIN] },
+        canActivate: [adminHomeGuard],
         loadComponent: () =>
           import('./features/admin/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboard),
+      },
+      {
+        path: 'commandes',
+        loadComponent: () =>
+          import('./features/admin/admin-orders/admin-orders').then((m) => m.AdminOrders),
+      },
+      {
+        path: 'commandes/:id',
+        loadComponent: () =>
+          import('./features/admin/admin-order-detail/admin-order-detail').then(
+            (m) => m.AdminOrderDetail,
+          ),
+      },
+      {
+        path: 'devis',
+        loadComponent: () =>
+          import('./features/admin/admin-quotes/admin-quotes').then((m) => m.AdminQuotes),
       },
     ],
   },

@@ -1,0 +1,85 @@
+<div>
+
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1 class="page-title mt-2">Commandes</h1>
+      <p class="page-lead">Confirmez, suivez et livrez les commandes de vos clients.</p>
+    </div>
+  </div>
+
+  @if (!loading && !error) {
+  <div class="scrollbar-hide -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+    @for (f of filters; track f.key) {
+    <button type="button" class="chip" [class.chip-active]="filter === f.key" (click)="filter = f.key">
+      {{ f.label }}
+      <span class="tabular text-xs opacity-70">{{ count(f.key) }}</span>
+    </button>
+    }
+  </div>
+  }
+
+  @if (loading) {
+  <div class="card divide-y divide-line" aria-busy="true">
+    @for (n of skeletons; track n) {
+    <div class="flex items-center gap-4 px-4 py-4">
+      <div class="skeleton h-4 w-12 rounded"></div>
+      <div class="skeleton h-4 w-1/4 rounded"></div>
+      <div class="skeleton h-4 flex-1 rounded"></div>
+      <div class="skeleton h-6 w-24 rounded-full"></div>
+    </div>
+    }
+  </div>
+  } @else if (error) {
+  <div class="alert-danger" role="alert">
+    <i class="pi pi-exclamation-circle mt-0.5"></i>
+    <span>Impossible de charger les commandes pour le moment.</span>
+  </div>
+  } @else if (!visibleOrders.length) {
+  <div class="empty">
+    <span class="empty-icon"><i class="pi pi-shopping-bag"></i></span>
+    <p class="empty-title">Aucune commande</p>
+    <p class="empty-text">
+      @if (filter === 'ALL') { Les commandes de vos clients apparaîtront ici. }
+      @else { Aucune commande avec ce statut pour le moment. }
+    </p>
+  </div>
+  } @else {
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+      <tr>
+        <th>N°</th>
+        <th>Date</th>
+        <th>Client</th>
+        <th class="text-right">Total</th>
+        <th>Statut</th>
+        <th><span class="sr-only">Actions</span></th>
+      </tr>
+      </thead>
+      <tbody>
+      @for (order of visibleOrders; track order.id) {
+      <tr>
+        <td class="font-semibold">
+          <a [routerLink]="['/admin/commandes', order.id]" class="hover:text-brand-700">n°{{ order.id }}</a>
+        </td>
+        <td class="whitespace-nowrap text-ink-2">{{ formatDate(order.dateCreation) }}</td>
+        <td>
+          <p class="font-medium text-ink">{{ order.customerName }}</p>
+          <p class="text-xs text-ink-3">{{ order.customerEmail }}</p>
+        </td>
+        <td class="tabular whitespace-nowrap text-right font-semibold">{{ formatPrice(order.totalAmount) }}</td>
+        <td>
+          <span [class]="statuses[order.status].badge">{{ statuses[order.status].label }}</span>
+        </td>
+        <td class="text-right">
+          <a [routerLink]="['/admin/commandes', order.id]" class="btn-secondary btn-sm">Ouvrir</a>
+        </td>
+      </tr>
+      }
+      </tbody>
+    </table>
+  </div>
+  }
+
+</div>

@@ -24,7 +24,14 @@
     <p class="mt-2 text-sm text-ink-2">
       Total : <strong class="tabular text-ink">{{ formatPrice(placedOrder.totalAmount) }}</strong>
     </p>
-    <p class="mt-1 text-sm text-ink-2">
+
+    @if (placedOrder.deliveryAddress; as delivery) {
+    <p class="mt-3 text-sm text-ink-2">
+      Livraison : <span class="text-ink">{{ delivery.address }}, {{ delivery.city }}</span>
+    </p>
+    }
+
+    <p class="mt-3 text-sm text-ink-2">
       Elle est enregistrée avec le statut « En attente ». Vous suivez son avancement dans « Mes commandes ».
     </p>
     <div class="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
@@ -58,44 +65,134 @@
 
   <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
 
-    <ul class="space-y-3">
-      @for (item of cart.items; track item.id) {
-      <li class="card card-pad flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="space-y-6">
 
-        <div class="min-w-0">
-          <a [routerLink]="['/produits', item.productSlug]"
-             class="block truncate font-semibold text-ink hover:text-brand-700">{{ item.productName }}</a>
-          <p class="tabular mt-0.5 text-sm text-ink-2">{{ formatPrice(item.unitPrice) }} l'unité</p>
-        </div>
+      <ul class="space-y-3">
+        @for (item of cart.items; track item.id) {
+        <li class="card card-pad flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-        <div class="flex items-center justify-between gap-4 sm:justify-end">
-          <div class="inline-flex items-center rounded-[10px] border border-line-strong bg-surface">
-            <button type="button" (click)="changeQuantity(item, -1)"
-                    [disabled]="item.quantity <= 1 || busyItemId !== null"
-                    class="flex h-10 w-10 items-center justify-center text-ink-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
-                    aria-label="Diminuer la quantité">
-              <i class="pi pi-minus text-xs"></i>
-            </button>
-            <span class="tabular w-10 text-center text-sm font-semibold text-ink">{{ item.quantity }}</span>
-            <button type="button" (click)="changeQuantity(item, 1)"
-                    [disabled]="busyItemId !== null"
-                    class="flex h-10 w-10 items-center justify-center text-ink-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
-                    aria-label="Augmenter la quantité">
-              <i class="pi pi-plus text-xs"></i>
+          <div class="min-w-0">
+            <a [routerLink]="['/produits', item.productSlug]"
+               class="block truncate font-semibold text-ink hover:text-brand-700">{{ item.productName }}</a>
+            <p class="tabular mt-0.5 text-sm text-ink-2">{{ formatPrice(item.unitPrice) }} l'unité</p>
+          </div>
+
+          <div class="flex items-center justify-between gap-4 sm:justify-end">
+            <div class="inline-flex items-center rounded-[10px] border border-line-strong bg-surface">
+              <button type="button" (click)="changeQuantity(item, -1)"
+                      [disabled]="item.quantity <= 1 || busyItemId !== null"
+                      class="flex h-10 w-10 items-center justify-center text-ink-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+                      aria-label="Diminuer la quantité">
+                <i class="pi pi-minus text-xs"></i>
+              </button>
+              <span class="tabular w-10 text-center text-sm font-semibold text-ink">{{ item.quantity }}</span>
+              <button type="button" (click)="changeQuantity(item, 1)"
+                      [disabled]="busyItemId !== null"
+                      class="flex h-10 w-10 items-center justify-center text-ink-2 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+                      aria-label="Augmenter la quantité">
+                <i class="pi pi-plus text-xs"></i>
+              </button>
+            </div>
+
+            <span class="tabular w-28 text-right font-semibold text-ink">{{ formatPrice(item.lineTotal) }}</span>
+
+            <button type="button" (click)="removeItem(item)" [disabled]="busyItemId !== null"
+                    class="btn-danger btn-icon" [attr.aria-label]="'Retirer ' + item.productName">
+              <i class="pi pi-trash"></i>
             </button>
           </div>
 
-          <span class="tabular w-28 text-right font-semibold text-ink">{{ formatPrice(item.lineTotal) }}</span>
+        </li>
+        }
+      </ul>
 
-          <button type="button" (click)="removeItem(item)" [disabled]="busyItemId !== null"
-                  class="btn-danger btn-icon" [attr.aria-label]="'Retirer ' + item.productName">
-            <i class="pi pi-trash"></i>
-          </button>
+      <!-- Adresse de livraison -->
+      <section id="delivery-section" class="card card-pad">
+        <h2 class="section-title">Adresse de livraison</h2>
+        <p class="section-lead">Indiquez où nous devons livrer votre commande.</p>
+
+        <div class="mt-5 rounded-xl bg-muted px-4 py-4">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-ink">Gagnez du temps</p>
+              <p class="text-sm text-ink-2">
+                Remplissez l'adresse avec votre position actuelle. Votre navigateur vous demandera l'autorisation.
+              </p>
+            </div>
+            <button type="button" class="btn-secondary shrink-0" (click)="locate()" [disabled]="locating">
+              <i class="pi pi-map-marker text-xs"></i>
+              {{ locating ? 'Localisation...' : 'Utiliser ma position' }}
+            </button>
+          </div>
+
+          @if (locationMessage) {
+          <p class="mt-3 text-sm text-warning">{{ locationMessage }}</p>
+          }
+
+          @if (latitude !== null) {
+          <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-2">
+                <span>
+                  <i class="pi pi-check-circle mr-1 text-success"></i>
+                  Position GPS jointe à la commande pour faciliter la livraison.
+                </span>
+            <button type="button" class="link" (click)="clearLocation()">Retirer</button>
+          </div>
+          @if (accuracy !== null && accuracy > 150) {
+          <p class="mt-1 text-sm text-warning">
+            Position approximative (environ {{ accuracy }} m) : vérifiez l'adresse ci-dessous.
+          </p>
+          }
+          }
         </div>
 
-      </li>
-      }
-    </ul>
+        <div class="mt-5 flex flex-col gap-4">
+
+          <div class="field">
+            <label class="field-label" for="deliveryAddress">Adresse</label>
+            <input id="deliveryAddress" type="text" autocomplete="address-line1"
+                   placeholder="Rue, quartier..."
+                   class="field-input" [class.border-danger]="fieldErrors['deliveryAddress']"
+                   [(ngModel)]="deliveryAddress">
+            @if (fieldErrors['deliveryAddress']) {
+            <p class="field-error">{{ fieldErrors['deliveryAddress'] }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="deliveryCity">Ville ou commune</label>
+            <input id="deliveryCity" type="text" autocomplete="address-level2"
+                   class="field-input" [class.border-danger]="fieldErrors['deliveryCity']"
+                   [(ngModel)]="deliveryCity">
+            @if (fieldErrors['deliveryCity']) {
+            <p class="field-error">{{ fieldErrors['deliveryCity'] }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="deliveryPhone">Téléphone pour la livraison</label>
+            <input id="deliveryPhone" type="tel" autocomplete="tel"
+                   class="field-input" [class.border-danger]="fieldErrors['deliveryPhone']"
+                   [(ngModel)]="deliveryPhone">
+            @if (fieldErrors['deliveryPhone']) {
+            <p class="field-error">{{ fieldErrors['deliveryPhone'] }}</p>
+            } @else {
+            <p class="field-hint">Le livreur pourra vous joindre sur ce numéro.</p>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="deliveryNotes">
+              Précisions pour le livreur <span class="font-normal text-ink-3">(facultatif)</span>
+            </label>
+            <textarea id="deliveryNotes" rows="2"
+                      placeholder="Repère, étage, instructions..."
+                      class="field-input" [(ngModel)]="deliveryNotes"></textarea>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
 
     <aside>
       <div class="card card-pad lg:sticky lg:top-24">

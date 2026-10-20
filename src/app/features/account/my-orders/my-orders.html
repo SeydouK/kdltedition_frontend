@@ -53,6 +53,17 @@
         }
       </ul>
 
+      @if (order.deliveryAddress; as delivery) {
+      <div class="mb-4 rounded-xl bg-muted px-4 py-3 text-sm text-ink-2">
+        <p class="text-2xs font-semibold uppercase tracking-eyebrow text-ink-3">Livraison</p>
+        <p class="mt-1 text-ink">{{ delivery.address }}, {{ delivery.city }}</p>
+        <p>Tél. {{ delivery.phone }}</p>
+        @if (delivery.notes) {
+        <p class="whitespace-pre-line">{{ delivery.notes }}</p>
+        }
+      </div>
+      }
+
       <div class="flex items-center justify-between border-t border-line pt-4">
         <span class="text-sm text-ink-2">Total</span>
         <span class="tabular text-lg font-semibold text-ink">{{ formatPrice(order.totalAmount) }}</span>

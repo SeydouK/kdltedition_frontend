@@ -10,10 +10,16 @@ export interface Quote {
   proposedPrice?: number;
   staffResponse?: string;
   dateCreation: string;
+  customerName?: string;
+  customerEmail?: string;
 }
-
 export interface CreateQuoteRequest {
   productId: number;
   quantity: number;
   specifications?: string;
+}
+export interface RespondQuoteRequest {
+  status: 'ANSWERED' | 'REJECTED';
+  proposedPrice?: number;
+  staffResponse?: string;
 }

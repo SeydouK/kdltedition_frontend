@@ -1,0 +1,168 @@
+<div>
+
+  <a routerLink="/admin/commandes" class="btn-ghost btn-sm -ml-3 mb-4">
+    <i class="pi pi-arrow-left text-xs"></i>Toutes les commandes
+  </a>
+
+  @if (loading) {
+  <div class="space-y-4" aria-busy="true">
+    <div class="skeleton h-9 w-1/2 rounded"></div>
+    <div class="skeleton h-40 w-full rounded-2xl"></div>
+    <div class="skeleton h-40 w-full rounded-2xl"></div>
+  </div>
+  } @else if (notFound) {
+  <div class="empty">
+    <span class="empty-icon"><i class="pi pi-exclamation-circle"></i></span>
+    <p class="empty-title">Commande introuvable</p>
+    <p class="empty-text">Cette commande n'existe pas ou a été supprimée.</p>
+    <a routerLink="/admin/commandes" class="btn-secondary mt-5">Retour aux commandes</a>
+  </div>
+  } @else if (order) {
+
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Commande</p>
+      <h1 class="page-title mt-2">n°{{ order.id }}</h1>
+      <p class="page-lead">Passée le {{ formatDate(order.dateCreation) }}</p>
+    </div>
+    <span [class]="statuses[order.status].badge">{{ statuses[order.status].label }}</span>
+  </div>
+
+  @if (successMessage) {
+  <div class="alert-success mb-6" role="status">
+    <i class="pi pi-check-circle mt-0.5"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+  }
+  @if (errorMessage) {
+  <div class="alert-danger mb-6" role="alert">
+    <i class="pi pi-exclamation-circle mt-0.5"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+  }
+
+  <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+
+    <div class="space-y-6">
+
+      <!-- Avancement et actions -->
+      <section class="card card-pad">
+        <h2 class="section-title">Avancement</h2>
+
+        @if (order.status === 'CANCELLED') {
+        <div class="alert-danger mt-4">
+          <i class="pi pi-ban mt-0.5"></i>
+          <span>Cette commande a été annulée.</span>
+        </div>
+        } @else {
+        <ol class="mt-5 grid grid-cols-5 gap-2">
+          @for (step of flow; track step) {
+          <li class="flex flex-col items-center gap-2 text-center">
+                  <span class="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold"
+                        [class]="stepClass(step)">
+                    @if (stepDone(step)) { <i class="pi pi-check text-[11px]"></i> } @else { {{ flow.indexOf(step) + 1 }} }
+                  </span>
+            <span class="text-[11px] font-medium leading-tight text-ink-2 sm:text-xs">{{ statuses[step].label }}</span>
+          </li>
+          }
+        </ol>
+        }
+
+        @if (actions.length) {
+        @if (confirmingCancel) {
+        <div class="alert-warning mt-6">
+          <i class="pi pi-exclamation-triangle mt-0.5"></i>
+          <div>
+            <p class="font-semibold">Annuler cette commande ?</p>
+            <p class="mt-1">Le client sera prévenu par email et la commande ne pourra plus être modifiée.</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button type="button" class="btn-danger btn-sm" (click)="confirmCancel()" [disabled]="updating">
+                Oui, annuler la commande
+              </button>
+              <button type="button" class="btn-ghost btn-sm" (click)="keepOrder()">Non, la conserver</button>
+            </div>
+          </div>
+        </div>
+        } @else {
+        <div class="mt-6 flex flex-wrap gap-3">
+          @for (action of actions; track action.status) {
+          <button type="button" [disabled]="updating" (click)="apply(action)"
+                  [class]="action.tone === 'danger' ? 'btn-danger' : 'btn-primary'">
+            {{ updating && action.tone !== 'danger' ? 'Mise à jour...' : action.label }}
+          </button>
+          }
+        </div>
+        <p class="field-hint mt-3">Chaque étape envoie automatiquement un email au client.</p>
+        }
+        } @else if (order.status === 'DELIVERED') {
+        <p class="mt-5 text-sm text-ink-2">Cette commande est terminée.</p>
+        }
+      </section>
+
+      <!-- Articles -->
+      <section class="card card-pad">
+        <h2 class="section-title">Articles</h2>
+
+        <ul class="mt-4 divide-y divide-line border-t border-line">
+          @for (item of order.items; track item.productId) {
+          <li class="flex items-center justify-between gap-4 py-3 text-sm">
+                <span class="min-w-0 text-ink">
+                  {{ item.productName }}
+                  <span class="text-ink-3">× {{ item.quantity }}</span>
+                </span>
+            <span class="tabular shrink-0 font-medium text-ink">{{ formatPrice(item.lineTotal) }}</span>
+          </li>
+          }
+        </ul>
+
+        <div class="flex items-center justify-between border-t border-line pt-4">
+          <span class="text-sm text-ink-2">Total</span>
+          <span class="tabular text-lg font-semibold text-ink">{{ formatPrice(order.totalAmount) }}</span>
+        </div>
+      </section>
+
+    </div>
+
+    <aside class="space-y-6">
+
+      <section class="card card-pad">
+        <h2 class="section-title">Client</h2>
+        <p class="mt-3 text-sm font-semibold text-ink">{{ order.customerName }}</p>
+        @if (order.customerEmail) {
+        <p class="mt-1 text-sm">
+          <a [href]="'mailto:' + order.customerEmail" class="link break-all">{{ order.customerEmail }}</a>
+        </p>
+        }
+      </section>
+
+      <section class="card card-pad">
+        <h2 class="section-title">Livraison</h2>
+
+        @if (order.deliveryAddress; as delivery) {
+        <p class="mt-3 text-sm text-ink">{{ delivery.address }}, {{ delivery.city }}</p>
+        <p class="mt-1 text-sm">
+          <a [href]="'tel:' + delivery.phone" class="link">{{ delivery.phone }}</a>
+        </p>
+
+        @if (delivery.notes) {
+        <p class="mt-3 whitespace-pre-line rounded-xl bg-muted px-3 py-2 text-sm text-ink-2">{{ delivery.notes }}</p>
+        }
+
+        @if (mapUrl(delivery); as url) {
+        <a [href]="url" target="_blank" rel="noopener" class="btn-secondary btn-sm mt-4">
+          <i class="pi pi-map-marker text-xs"></i>Voir sur la carte
+        </a>
+        }
+        } @else {
+        <p class="mt-3 text-sm text-ink-3">
+          Aucune adresse enregistrée (commande passée avant l'ajout de l'adresse de livraison).
+        </p>
+        }
+      </section>
+
+    </aside>
+
+  </div>
+  }
+
+</div>
