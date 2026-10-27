@@ -1,0 +1,141 @@
+<div>
+
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1 class="page-title mt-2">Catégories</h1>
+      <p class="page-lead">Organisez le catalogue : chaque produit appartient à une catégorie.</p>
+    </div>
+    @if (!formOpen) {
+    <button type="button" class="btn-primary self-start sm:self-auto" (click)="openCreate()">
+      <i class="pi pi-plus text-xs"></i>Nouvelle catégorie
+    </button>
+    }
+  </div>
+
+  @if (successMessage) {
+  <div class="alert-success mb-6" role="status">
+    <i class="pi pi-check-circle mt-0.5"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+  }
+  @if (errorMessage) {
+  <div class="alert-danger mb-6" role="alert">
+    <i class="pi pi-exclamation-circle mt-0.5"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+  }
+
+  @if (formOpen) {
+  <form class="card card-pad mb-6 flex flex-col gap-4" (ngSubmit)="save()" novalidate>
+    <h2 class="section-title">{{ editingId === null ? 'Nouvelle catégorie' : 'Modifier la catégorie' }}</h2>
+
+    @if (formError) {
+    <div class="alert-danger" role="alert">
+      <i class="pi pi-exclamation-circle mt-0.5"></i>
+      <span>{{ formError }}</span>
+    </div>
+    }
+
+    <div class="field">
+      <label class="field-label" for="category-name">Nom</label>
+      <input id="category-name" name="name" type="text" maxlength="100" class="field-input"
+             [class.border-danger]="nameError" [(ngModel)]="name">
+      @if (nameError) { <p class="field-error">{{ nameError }}</p> }
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="category-description">
+        Description <span class="font-normal text-ink-3">(facultatif)</span>
+      </label>
+      <textarea id="category-description" name="description" rows="3" maxlength="1000"
+                class="field-input" [(ngModel)]="description"></textarea>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button type="submit" class="btn-primary" [disabled]="saving">
+        {{ saving ? 'Enregistrement...' : (editingId === null ? 'Créer la catégorie' : 'Enregistrer') }}
+      </button>
+      <button type="button" class="btn-ghost" (click)="closeForm()">Annuler</button>
+    </div>
+  </form>
+  }
+
+  @if (loading) {
+  <div class="card divide-y divide-line" aria-busy="true">
+    @for (n of skeletons; track n) {
+    <div class="flex items-center gap-4 px-4 py-4">
+      <div class="skeleton h-4 w-1/4 rounded"></div>
+      <div class="skeleton h-4 flex-1 rounded"></div>
+    </div>
+    }
+  </div>
+  } @else if (error) {
+  <div class="alert-danger" role="alert">
+    <i class="pi pi-exclamation-circle mt-0.5"></i>
+    <span>Impossible de charger les catégories pour le moment.</span>
+  </div>
+  } @else if (!categories.length) {
+  <div class="empty">
+    <span class="empty-icon"><i class="pi pi-tags"></i></span>
+    <p class="empty-title">Aucune catégorie</p>
+    <p class="empty-text">Créez votre première catégorie pour pouvoir y ranger des produits.</p>
+    @if (!formOpen) {
+    <button type="button" class="btn-primary mt-5" (click)="openCreate()">Nouvelle catégorie</button>
+    }
+  </div>
+  } @else {
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+      <tr>
+        <th>Catégorie</th>
+        <th>Description</th>
+        <th class="text-right">Produits</th>
+        <th><span class="sr-only">Actions</span></th>
+      </tr>
+      </thead>
+      <tbody>
+      @for (category of categories; track category.id) {
+      <tr>
+        <td>
+          <p class="font-semibold text-ink">{{ category.name }}</p>
+          <p class="text-xs text-ink-3">{{ category.slug }}</p>
+        </td>
+        <td class="max-w-xs text-ink-2">
+          <p class="line-clamp-2">{{ category.description || '—' }}</p>
+        </td>
+        <td class="tabular text-right">{{ count(category) }}</td>
+        <td>
+          <div class="flex justify-end gap-2">
+            @if (confirmDeleteId === category.id) {
+            <span class="self-center text-sm text-ink-2">Supprimer ?</span>
+            <button type="button" class="btn-danger btn-sm" (click)="confirmDelete(category)"
+                    [disabled]="deletingId !== null">
+              {{ deletingId === category.id ? 'Suppression...' : 'Oui' }}
+            </button>
+            <button type="button" class="btn-ghost btn-sm" (click)="cancelDelete()">Non</button>
+            } @else {
+            <button type="button" class="btn-secondary btn-sm" (click)="openEdit(category)">Modifier</button>
+            @if (canDelete) {
+            <button type="button" class="btn-ghost btn-sm" (click)="askDelete(category)"
+                    [disabled]="count(category) > 0"
+                    [attr.title]="count(category) > 0 ? 'Cette catégorie contient des produits' : null">
+              Supprimer
+            </button>
+            }
+            }
+          </div>
+        </td>
+      </tr>
+      }
+      </tbody>
+    </table>
+  </div>
+
+  @if (canDelete) {
+  <p class="field-hint mt-3">Une catégorie qui contient des produits ne peut pas être supprimée.</p>
+  }
+  }
+
+</div>

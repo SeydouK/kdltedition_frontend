@@ -6,8 +6,27 @@ export interface Product {
   slug: string;
   description?: string;
   type: ProductType;
-  basePrice?: number;
-  imageUrl?: string;
+  basePrice?: number | null;
+  imageUrl?: string | null;
   categoryId: number;
   categoryName: string;
+  active?: boolean;
+}
+
+export interface CreateProductRequest {
+  categoryId: number;
+  name: string;
+  slug: string;
+  description?: string;
+  type: ProductType;
+  basePrice?: number;
+}
+
+export interface UpdateProductRequest {
+  categoryId?: number;
+  name?: string;
+  description?: string;
+  type?: ProductType;
+  basePrice?: number;
+  active?: boolean;
 }

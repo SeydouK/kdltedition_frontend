@@ -6,6 +6,7 @@ import { JwtResponse } from '../models/jwt-response.model';
 import { User } from '../models/user.model';
 import { Role } from '../models/role.enum';
 import { StorageService } from './storage.service';
+import { isJwtExpired } from '../utils/jwt.utils';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -16,7 +17,14 @@ export class AuthService {
     private http: HttpClient,
     private storage: StorageService,
   ) {
-    this.currentUserSubject = new BehaviorSubject<User | null>(this.storage.getUser());
+    const token = this.storage.getToken();
+    const sessionValid = !!token && !isJwtExpired(token);
+    if (!sessionValid) this.storage.clear();
+
+    this.currentUserSubject = new BehaviorSubject<User | null>(
+      sessionValid ? this.storage.getUser() : null,
+    );
+
     this.currentUser$ = this.currentUserSubject.asObservable();
   }
 
@@ -43,7 +51,8 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.storage.getToken();
+    const token = this.storage.getToken();
+    return !!token && !isJwtExpired(token);
   }
 
   hasRole(...roles: Role[]): boolean {
