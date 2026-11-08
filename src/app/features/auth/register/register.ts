@@ -33,7 +33,7 @@ export class Register implements OnInit {
   fieldErrors: Record<string, string> = {};
 
   readonly points = [
-    'Votre invitation est valable 30 minutes',
+    "Votre lien d'invitation est personnel et limité dans le temps",
     'Choisissez un mot de passe pour activer votre compte',
   ];
 

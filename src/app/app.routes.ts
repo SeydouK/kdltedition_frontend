@@ -136,4 +136,11 @@ export const routes: Routes = [
     path: '**',
     redirectTo: '',
   },
+  {
+    path: 'utilisateurs',
+    canActivate: [roleGuard],
+    data: { roles: [Role.OWNER, Role.ADMIN] },
+    loadComponent: () =>
+      import('./features/admin/admin-users/admin-users').then((m) => m.AdminUsers),
+  },
 ];

@@ -1,0 +1,180 @@
+<div>
+
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1 class="page-title mt-2">Utilisateurs</h1>
+      <p class="page-lead">Invitez des modérateurs ou des administrateurs et gérez les accès de l'équipe.</p>
+    </div>
+  </div>
+
+  <!-- Invitation -->
+  <form class="card card-pad mb-6" (ngSubmit)="invite()" novalidate>
+    <h2 class="section-title">Inviter un membre de l'équipe</h2>
+    <p class="section-lead">La personne reçoit un email avec un lien pour créer son compte.</p>
+
+    @if (inviteSuccess) {
+    <div class="alert-success mt-4" role="status">
+      <i class="pi pi-check-circle mt-0.5"></i>
+      <span>{{ inviteSuccess }}</span>
+    </div>
+    }
+    @if (inviteError) {
+    <div class="alert-danger mt-4" role="alert">
+      <i class="pi pi-exclamation-circle mt-0.5"></i>
+      <span>{{ inviteError }}</span>
+    </div>
+    }
+
+    <div class="mt-4 grid gap-4 sm:grid-cols-[minmax(0,1fr)_200px_auto] sm:items-start">
+      <div class="field">
+        <label class="field-label" for="invite-email">Adresse email</label>
+        <input id="invite-email" name="inviteEmail" type="email" autocomplete="off" placeholder="prenom@exemple.com"
+               class="field-input" [class.border-danger]="inviteEmailError" [(ngModel)]="inviteEmail">
+        @if (inviteEmailError) { <p class="field-error">{{ inviteEmailError }}</p> }
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="invite-role">Rôle</label>
+        <select id="invite-role" name="inviteRole" class="field-input" [(ngModel)]="inviteRole">
+          @for (role of assignable; track role) {
+          <option [ngValue]="role">{{ roles[role].label }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <span class="field-label hidden sm:block">&nbsp;</span>
+        <button type="submit" class="btn-primary" [disabled]="inviting">
+          {{ inviting ? 'Envoi...' : 'Envoyer l\'invitation' }}
+        </button>
+      </div>
+    </div>
+
+    <p class="field-hint mt-3">
+      Un modérateur gère les commandes, les devis et le catalogue. Un administrateur a en plus accès aux
+      statistiques et à la gestion des utilisateurs.
+    </p>
+  </form>
+
+  @if (successMessage) {
+  <div class="alert-success mb-6" role="status">
+    <i class="pi pi-check-circle mt-0.5"></i>
+    <span>{{ successMessage }}</span>
+  </div>
+  }
+  @if (errorMessage) {
+  <div class="alert-danger mb-6" role="alert">
+    <i class="pi pi-exclamation-circle mt-0.5"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+  }
+
+  @if (!loading && !error) {
+  <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="scrollbar-hide -mx-4 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+      @for (f of filters; track f.key) {
+      <button type="button" class="chip" [class.chip-active]="filter === f.key" (click)="filter = f.key">
+        {{ f.label }}
+        <span class="tabular text-xs opacity-70">{{ count(f.key) }}</span>
+      </button>
+      }
+    </div>
+
+    <input type="search" name="search" placeholder="Rechercher un nom ou un email..." aria-label="Rechercher un utilisateur"
+           class="field-input sm:w-72" [(ngModel)]="search">
+  </div>
+  }
+
+  @if (loading) {
+  <div class="card divide-y divide-line" aria-busy="true">
+    @for (n of skeletons; track n) {
+    <div class="flex items-center gap-4 px-4 py-4">
+      <div class="skeleton h-9 w-9 rounded-full"></div>
+      <div class="skeleton h-4 w-1/3 rounded"></div>
+      <div class="skeleton h-4 flex-1 rounded"></div>
+    </div>
+    }
+  </div>
+  } @else if (error) {
+  <div class="alert-danger" role="alert">
+    <i class="pi pi-exclamation-circle mt-0.5"></i>
+    <span>Impossible de charger les utilisateurs pour le moment.</span>
+  </div>
+  } @else if (!visibleUsers.length) {
+  <div class="empty">
+    <span class="empty-icon"><i class="pi pi-users"></i></span>
+    <p class="empty-title">Aucun utilisateur</p>
+    <p class="empty-text">Aucun compte ne correspond à ce filtre ou à cette recherche.</p>
+  </div>
+  } @else {
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+      <tr>
+        <th>Utilisateur</th>
+        <th>Rôle</th>
+        <th>Statut</th>
+        <th><span class="sr-only">Actions</span></th>
+      </tr>
+      </thead>
+      <tbody>
+      @for (user of visibleUsers; track user.id) {
+      <tr>
+        <td>
+          <div class="flex items-center gap-3">
+            <span class="avatar h-9 w-9 text-sm">{{ (user.firstName[0] || user.email[0]).toUpperCase() }}</span>
+            <div class="min-w-0">
+              <p class="font-semibold text-ink">
+                {{ fullName(user) }}
+                @if (isMe(user)) { <span class="badge-neutral ml-1">Vous</span> }
+              </p>
+              <p class="truncate text-xs text-ink-3">{{ user.email }}</p>
+            </div>
+          </div>
+        </td>
+
+        <td><span [class]="roles[user.role].badge">{{ roles[user.role].label }}</span></td>
+
+        <td>
+          @if (user.active) {
+          <span class="badge-success">Actif</span>
+          } @else {
+          <span class="badge-warning">Désactivé</span>
+          }
+        </td>
+
+        <td>
+          <div class="flex flex-wrap items-center justify-end gap-2">
+            @if (!canManage(user)) {
+            <span class="text-xs text-ink-3">
+                      {{ isMe(user) ? 'Votre compte' : 'Non modifiable' }}
+                    </span>
+            } @else if (pending && pending.userId === user.id) {
+            <span class="text-sm text-ink-2">{{ confirmText() }}</span>
+            <button type="button" class="btn-danger btn-sm" (click)="confirm(user)" [disabled]="busyId !== null">
+              {{ busyId === user.id ? '...' : 'Oui' }}
+            </button>
+            <button type="button" class="btn-ghost btn-sm" (click)="cancel()">Non</button>
+            } @else if (!user.active) {
+            <button type="button" class="btn-secondary btn-sm" (click)="activate(user)" [disabled]="busyId !== null">
+              Réactiver
+            </button>
+            } @else {
+            <button type="button" class="btn-secondary btn-sm" (click)="askRole(user)" [disabled]="busyId !== null">
+              {{ roleChange(user).label }}
+            </button>
+            <button type="button" class="btn-ghost btn-sm" (click)="askDeactivate(user)" [disabled]="busyId !== null">
+              Désactiver
+            </button>
+            }
+          </div>
+        </td>
+      </tr>
+      }
+      </tbody>
+    </table>
+  </div>
+  }
+
+</div>

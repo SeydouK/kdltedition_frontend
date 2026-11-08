@@ -23,6 +23,12 @@
            class="menu-item shrink-0 whitespace-nowrap">
           <i class="pi pi-tags menu-icon"></i>Catégories
         </a>
+        @if (authService.hasRole(Role.OWNER, Role.ADMIN)) {
+        <a routerLink="/admin/utilisateurs" routerLinkActive="!bg-brand-50 !text-brand-800"
+           class="menu-item shrink-0 whitespace-nowrap">
+          <i class="pi pi-users menu-icon"></i>Utilisateurs
+        </a>
+        }
         <a routerLink="/admin/devis" routerLinkActive="!bg-brand-50 !text-brand-800"
            class="menu-item shrink-0 whitespace-nowrap">
           <i class="pi pi-file menu-icon"></i>Devis
